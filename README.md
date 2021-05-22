@@ -2,7 +2,7 @@
 
 想要启动 Phar 文件打包功能，首先要在 php.ini 中配置 phar.readonly = Off
 
-
+```
 //打包
 <?php
 $fileName = __DIR__ . '/test/test.phar';
@@ -23,3 +23,4 @@ $phar = new Phar($fileName);
 $re=$phar->extractTo("Thrift-origin");
 var_dump($re);
 exit;
+```
