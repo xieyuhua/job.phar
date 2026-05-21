@@ -25,6 +25,34 @@ var_dump($re);
 exit;
 ```
 
+```
+// 'debug'  => true,
+Db::listen(function ($sql, $time, $master) {
+    if ($time > 0.5) {
+        $redis = new Redis(); $redis->connect('127.0.0.1', 6379);
+        $redis->rPush('sql_log_queue', json_encode(['sql'=>$sql, 'time'=>$time, 't'=>time()]));
+        $redis->close();
+    }
+});
+
+// 'debug'  => true,
+Db::listen(function ($sql, $time, $master) {
+    $line = sprintf(
+        "[%s] conn=%s master=%s time=%.3fs sql=%s\n",
+        date('Y-m-d H:i:s'),
+        Db::getConfig('default'),
+        $master ? 'Y' : 'N',
+        $time,
+        $sql
+    );
+    file_put_contents('sql.log', $line, FILE_APPEND);
+    // 慢 SQL
+    if ($time > 0.3) {
+        file_put_contents('slow.sql.log', $line, FILE_APPEND);
+    }
+});
+```
+
 
 //扩展 xieyuhua.so
 ```
