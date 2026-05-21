@@ -49,6 +49,24 @@ $db = [
 ];
 Db::setConfig($db);
 
+// 'debug'  => true,
+Db::listen(function ($sql, $time, $master) {
+    $line = sprintf(
+        "[%s] conn=%s master=%s time=%.3fs sql=%s\n",
+        date('Y-m-d H:i:s'),
+        Db::getConfig('default'),
+        $master ? 'Y' : 'N',
+        $time,
+        $sql
+    );
+    file_put_contents('sql.log', $line, FILE_APPEND);
+    // 慢 SQL
+    if ($time > 0.3) {
+        file_put_contents('slow.sql.log', $line, FILE_APPEND);
+    }
+});
+
+
 // 创建进程
 function createSingletonDaemon($processName, $callback, $options = []) {
     $defaults = [
